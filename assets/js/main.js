@@ -140,6 +140,7 @@
     var popText = document.getElementById('fpopText');
     var popProds = document.getElementById('fpopProds');
     var points = Array.prototype.slice.call(faceMap.querySelectorAll('.fpoint'));
+    var regions = Array.prototype.slice.call(faceMap.querySelectorAll('.fregion'));
     var prodBtns = Array.prototype.slice.call(document.querySelectorAll('.fprod'));
     var activePoint = null;
     var isSheet = function () { return window.matchMedia('(max-width:992px)').matches; };
@@ -227,12 +228,20 @@
       }).join('');
     };
 
+    /* light up the drawn zone that belongs to a point */
+    var markRegions = function (cls, key) {
+      regions.forEach(function (r) {
+        r.classList.toggle(cls, r.dataset.region === key);
+      });
+    };
+
     var closePop = function (refocus) {
       if (!activePoint) return;
       activePoint.classList.remove('is-on');
       activePoint.setAttribute('aria-expanded', 'false');
       if (refocus) activePoint.focus();
       activePoint = null;
+      markRegions('is-on', null);
       pop.classList.remove('is-open');
       window.setTimeout(function () { if (!activePoint) pop.hidden = true; }, 300);
     };
@@ -246,6 +255,7 @@
       activePoint = btn;
       btn.classList.add('is-on');
       btn.setAttribute('aria-expanded', 'true');
+      markRegions('is-on', btn.dataset.point);
       renderPop(btn.dataset.point);
       pop.hidden = false;
       placePop(btn);
@@ -258,6 +268,15 @@
         e.stopPropagation();
         openPop(btn);
       });
+      /* previewing the zone before committing to a click */
+      var preview = function () {
+        if (!activePoint) markRegions('is-hover', btn.dataset.point);
+      };
+      var clear = function () { markRegions('is-hover', null); };
+      btn.addEventListener('mouseenter', preview);
+      btn.addEventListener('mouseleave', clear);
+      btn.addEventListener('focus', preview);
+      btn.addEventListener('blur', clear);
     });
 
     popClose.addEventListener('click', function () { closePop(true); });
@@ -273,9 +292,16 @@
     /* product key ↔ points */
     var filterBy = function (id) {
       faceMap.classList.toggle('is-filtered', !!id);
+      var covers = function (key) {
+        var data = FACE_POINTS[key];
+        return !!id && !!data && data.products.indexOf(id) > -1;
+      };
       points.forEach(function (p) {
-        var data = FACE_POINTS[p.dataset.point];
-        p.classList.toggle('is-match', !!id && data && data.products.indexOf(id) > -1);
+        p.classList.toggle('is-match', covers(p.dataset.point));
+      });
+      /* the zones preview what the selected product actually treats */
+      regions.forEach(function (r) {
+        r.classList.toggle('is-match', covers(r.dataset.region));
       });
       prodBtns.forEach(function (b) {
         var on = b.dataset.product === id;

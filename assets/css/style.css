@@ -250,7 +250,7 @@ button{background:none;border:0;cursor:pointer}
   position:relative;z-index:3;
   width:100%;max-width:1560px;margin-inline:auto;padding-inline:34px;
   display:grid;
-  grid-template-columns:minmax(0,1.58fr) minmax(0,1.08fr) minmax(0,.9fr);
+  grid-template-columns:minmax(0,1.44fr) minmax(0,1.32fr) minmax(0,.88fr);
   align-items:stretch;
   gap:20px;
 }
@@ -332,11 +332,11 @@ button{background:none;border:0;cursor:pointer}
 .hero__figure{
   align-self:end;
   position:relative;
-  margin:0 -14px -64px -46px;
+  margin:0 -6px -64px -26px;
 }
 .hero__figure img{
   width:100%;
-  height:clamp(390px,34vw,492px);
+  height:clamp(470px,44vw,660px);
   object-fit:cover;
   object-position:center 14%;
   border-radius:999px 999px 0 0;
@@ -643,6 +643,39 @@ button{background:none;border:0;cursor:pointer}
   background:var(--green);
   box-shadow:0 0 0 4px rgba(28,169,124,.18);
 }
+
+/* --- treatment zones --- */
+.fregions{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  z-index:2;pointer-events:none;
+  overflow:visible;
+}
+.fregion{
+  opacity:0;
+  transition:opacity .45s var(--ease);
+}
+.fregion--fine{color:#2FC697}
+.fregion--mid{color:var(--green)}
+.fregion--subq{color:#0E8A63}
+
+.fzone{
+  fill:currentColor;fill-opacity:.26;
+  stroke:currentColor;stroke-opacity:.95;
+  stroke-width:.55;stroke-dasharray:2.4 1.9;stroke-linecap:round;
+  filter:drop-shadow(0 0 1.4px currentColor);
+}
+/* the jawline reads as a band along the contour, not a closed shape */
+.fzone--band{
+  fill:none;
+  stroke-width:2.6;stroke-opacity:.36;stroke-dasharray:none;
+}
+
+.fregion.is-hover{opacity:.55}
+.facemap__frame.is-filtered .fregion.is-match{opacity:.72}
+.fregion.is-on{opacity:1}
+.fregion.is-on .fzone{animation:fdash 16s linear infinite}
+@keyframes fdash{to{stroke-dashoffset:-43}}
 
 /* --- injection points --- */
 .fpoint{
